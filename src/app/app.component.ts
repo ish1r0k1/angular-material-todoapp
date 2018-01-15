@@ -1,4 +1,4 @@
-import { Component, OnInit, /*NgZone*/ } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
 import { TodoService } from './services/todo.service';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -15,21 +15,23 @@ export class AppComponent implements OnInit {
   newTodoText = '';
   dataSource: any;
   selection = new SelectionModel<Todo>(true, []);
-  private todos: Todo[];
-  private filterType: string;
+  private remain: number;
 
-  constructor(private todoService: TodoService, /*private zone: NgZone*/) {
-    // zone.onMicrotaskEmpty.subscribe(() => { console.log('detect change'); });
+  constructor(private todoService: TodoService, private zone: NgZone) {
+    zone.onMicrotaskEmpty.subscribe(() => { console.log('detect change'); });
   }
 
   ngOnInit() {
     this.todoService.todos$.subscribe(todos => {
-      this.todos = todos;
-      this.dataSource = new MatTableDataSource<Todo>(this.todos);
-      this.applyFilter();
+      this.dataSource = new MatTableDataSource<Todo>(todos.data);
+      this.remain = todos.remain;
     });
 
-    this.todoService.getTodos();
+    this.todoService.getAllTodos();
+  }
+
+  toggleCompletion(todo: Todo): void {
+    this.todoService.toggleCompletion(todo);
   }
 
   addTodo(): void {
@@ -39,47 +41,26 @@ export class AppComponent implements OnInit {
     }
   }
 
-  getCompleted(): Todo[] {
-    return this.completedFilter(true);
-  }
-
-  getRemaining(): Todo[] {
-    return this.completedFilter(false);
-  }
-
-  completedFilter(status): Todo[] {
-    return this.todos.filter((todo: Todo) => todo.completed === status);
-  }
-
-  changeFilter($event: { source: MatRadioButton, value: any }): void {
-    this.filterType = $event.value.toString();
-    this.applyFilter();
-  }
-
-  applyFilter(): void {
-    switch (this.filterType) {
-      case 'all':
-        this.dataSource = new MatTableDataSource<Todo>(this.todos);
-        break;
-      case 'active':
-        this.dataSource = new MatTableDataSource<Todo>(this.getRemaining());
-        break;
-      case 'completed':
-        this.dataSource = new MatTableDataSource<Todo>(this.getCompleted());
-        break;
-      default:
-    }
-  }
-
   removeTodo(todo: Todo): void {
     this.todoService.remove(todo);
   }
 
-  removeCompletedTodo(): void {
-    this.todoService.removeCompleted();
+  changeFilter($event: { source: MatRadioButton, value: any }): void {
+    const filterType = $event.value.toString();
+
+    switch (filterType) {
+      case 'active':
+        this.todoService.getRemainingTodos();
+        break;
+      case 'completed':
+        this.todoService.getCompletedTodos();
+        break;
+      default:
+        this.todoService.getAllTodos();
+    }
   }
 
-  toggleCompletion(todo: Todo): void {
-    this.todoService.toggleCompletion(todo);
+  removeCompletedTodos(): void {
+    this.todoService.removeCompletedAll();
   }
 }

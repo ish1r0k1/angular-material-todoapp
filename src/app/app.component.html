@@ -10,14 +10,7 @@
   <main class="app__main" *ngIf="dataSource?.data.length > 0;">
     <mat-table #table [dataSource]="dataSource" class="todoTable">
       <ng-container matColumnDef="status">
-        <mat-header-cell *matHeaderCellDef class="todoTable__row todoTable__row--status">
-<!-- 
-          <mat-checkbox (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()">
-          </mat-checkbox>
- -->
-        </mat-header-cell>
+        <mat-header-cell *matHeaderCellDef class="todoTable__row todoTable__row--status"> </mat-header-cell>
         <mat-cell *matCellDef="let row" class="todoTable__row todoTable__row--status">
           <mat-checkbox (click)="$event.stopPropagation()"
                         (change)="$event ? toggleCompletion(row) : null"
@@ -43,16 +36,16 @@
     </mat-table>
   </main>
   <footer class="app__footer cf">
-    <span class="count">{{getRemaining().length}} items left</span>
+    <span class="count">{{remain}} items left</span>
 
     <span class="filter">
-      <mat-radio-group (change)="changeFilter($event)" value="all">
-        <mat-radio-button value="all">All</mat-radio-button>
+      <mat-radio-group (change)="changeFilter($event)" value="none">
+        <mat-radio-button value="none">All</mat-radio-button>
         <mat-radio-button value="active">Active</mat-radio-button>
         <mat-radio-button value="completed">Completed</mat-radio-button>
       </mat-radio-group>
     </span>
 
-    <button class="clear-completed" mat-button *ngIf="getCompleted().length > 0" (click)="removeCompletedTodo()">Clear completed</button>
+    <button class="clear-completed" mat-button *ngIf="remain !== dataSource?.data.length" (click)="removeCompletedTodos()">Clear completed</button>
   </footer>
 </div>

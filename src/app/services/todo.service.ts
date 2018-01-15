@@ -7,7 +7,7 @@ export class TodoService {
   private todosObserver: any;
   private MY_STORAGE_KEY = 'angular-todo';
 
-  todos$: Observable<Todo[]>;
+  todos$: Observable<{remain: number, data: Todo[]}>;
 
   constructor() {
     this.todos$ = new Observable(observer => {
@@ -19,39 +19,63 @@ export class TodoService {
     return JSON.parse(localStorage.getItem(this.MY_STORAGE_KEY)) || [];
   }
 
-  getTodos() {
-    this.todosObserver.next(this.fetchTodos());
+  private fetchTodosWithCompleted(completed: Boolean) {
+    return this.fetchTodos().filter((todo: Todo) => todo.completed === completed);
   }
 
-  add(title: string) {
-    const todos = this.fetchTodos().concat(new Todo(title));
+  private updateTodos(todos: Todo[]) {
     localStorage.setItem(this.MY_STORAGE_KEY, JSON.stringify(todos));
-    this.todosObserver.next(this.fetchTodos());
-  }
-
-  remove(todo: Todo) {
-    const todos = this.fetchTodos();
-    const filteredTodos = todos.filter((_todo) => {
-      return _todo.id !== todo.id;
+    this.todosObserver.next({
+      remain: this.getRemain(),
+      data: todos
     });
-    localStorage.setItem(this.MY_STORAGE_KEY, JSON.stringify(filteredTodos));
-    this.todosObserver.next(this.fetchTodos());
   }
 
-  removeCompleted() {
-    const uncompletedTodos = this.fetchTodos().filter((todo: Todo) => todo.completed !== true);
-    localStorage.setItem(this.MY_STORAGE_KEY, JSON.stringify(uncompletedTodos));
-    this.todosObserver.next(this.fetchTodos());
+  private getRemain(): number {
+    return this.fetchTodosWithCompleted(false).length;
+  }
+
+  private updateObserver(todos) {
+    this.todosObserver.next({
+      remain: this.getRemain(),
+      data: todos
+    });
+  }
+
+  getAllTodos() {
+    this.updateObserver(this.fetchTodos());
+  }
+
+  getRemainingTodos() {
+    this.updateObserver(this.fetchTodosWithCompleted(false));
+  }
+
+  getCompletedTodos() {
+    this.updateObserver(this.fetchTodosWithCompleted(true));
   }
 
   toggleCompletion(todo: Todo) {
     const todos = this.fetchTodos();
-    const filteredTodo = todos.filter(_todo => {
+    const targetTodo = todos.filter(_todo => {
       return _todo.id === todo.id;
     })[0];
-    filteredTodo.completed = !filteredTodo.completed;
+    targetTodo.completed = !targetTodo.completed;
+    this.updateTodos(todos);
+  }
 
-    localStorage.setItem(this.MY_STORAGE_KEY, JSON.stringify(todos));
-    this.todosObserver.next(this.fetchTodos());
+  add(title: string) {
+    const todos = this.fetchTodos().concat(new Todo(title));
+    this.updateTodos(todos);
+  }
+
+  remove(todo: Todo) {
+    const filteredTodos = this.fetchTodos().filter(_todo => {
+      return _todo.id !== todo.id;
+    });
+    this.updateTodos(filteredTodos);
+  }
+
+  removeCompletedAll() {
+    this.updateTodos(this.fetchTodosWithCompleted(false));
   }
 }
