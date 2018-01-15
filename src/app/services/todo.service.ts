@@ -6,6 +6,7 @@ import { Todo } from '../models';
 export class TodoService {
   private todosObserver: any;
   private MY_STORAGE_KEY = 'angular-todo';
+  private latestGetFunc: Function;
 
   todos$: Observable<{remain: number, data: Todo[]}>;
 
@@ -25,10 +26,7 @@ export class TodoService {
 
   private updateTodos(todos: Todo[]) {
     localStorage.setItem(this.MY_STORAGE_KEY, JSON.stringify(todos));
-    this.todosObserver.next({
-      remain: this.getRemain(),
-      data: todos
-    });
+    this.latestGetFunc();
   }
 
   private getRemain(): number {
@@ -44,14 +42,17 @@ export class TodoService {
 
   getAllTodos() {
     this.updateObserver(this.fetchTodos());
+    this.latestGetFunc = this.getAllTodos;
   }
 
   getRemainingTodos() {
     this.updateObserver(this.fetchTodosWithCompleted(false));
+    this.latestGetFunc = this.getRemainingTodos;
   }
 
   getCompletedTodos() {
     this.updateObserver(this.fetchTodosWithCompleted(true));
+    this.latestGetFunc = this.getCompletedTodos;
   }
 
   toggleCompletion(todo: Todo) {

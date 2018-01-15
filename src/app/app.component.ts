@@ -15,7 +15,9 @@ export class AppComponent implements OnInit {
   newTodoText = '';
   dataSource: any;
   selection = new SelectionModel<Todo>(true, []);
+
   private remain: number;
+  private filterType: string;
 
   constructor(private todoService: TodoService, private zone: NgZone) {
     zone.onMicrotaskEmpty.subscribe(() => { console.log('detect change'); });
