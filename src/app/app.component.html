@@ -1,20 +1,58 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div class="app mat-elevation-z8">
+  <div class="app__header">
+    <mat-toolbar color="primary">Todos</mat-toolbar>
+    <form class="new-todo-container">
+      <mat-form-field class="is-fullWidth">
+        <input type="text" matInput autofocus placeholder="What needs to be done?" [(ngModel)]="newTodoText" name="todo" (keyup.enter)="addTodo()">
+      </mat-form-field>
+    </form>
+  </div>
+  <main class="app__main" *ngIf="dataSource?.data.length > 0;">
+    <mat-table #table [dataSource]="dataSource" class="todoTable">
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef class="todoTable__row todoTable__row--status">
+<!-- 
+          <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+ -->
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="todoTable__row todoTable__row--status">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? toggleCompletion(row) : null"
+                        [checked]="row.completed">
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
 
+      <ng-container matColumnDef="title">
+        <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
+        <mat-cell *matCellDef="let row"> {{row._title}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="delete">
+        <mat-header-cell *matHeaderCellDef class="todoTable__row todoTable__row--delete"> </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="todoTable__row todoTable__row--delete">
+          <button mat-button (click)="removeTodo(row)">Delete</button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="toggleCompletion(row)"></mat-row>
+    </mat-table>
+  </main>
+  <footer class="app__footer cf">
+    <span class="count">{{getRemaining().length}} items left</span>
+
+    <span class="filter">
+      <mat-radio-group (change)="changeFilter($event)" value="all">
+        <mat-radio-button value="all">All</mat-radio-button>
+        <mat-radio-button value="active">Active</mat-radio-button>
+        <mat-radio-button value="completed">Completed</mat-radio-button>
+      </mat-radio-group>
+    </span>
+
+    <button class="clear-completed" mat-button *ngIf="getCompleted().length > 0" (click)="removeCompletedTodo()">Clear completed</button>
+  </footer>
+</div>

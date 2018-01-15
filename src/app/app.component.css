@@ -1,0 +1,81 @@
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.app__header {
+  border: solid rgba(0, 0, 0, .16);
+  border-width: 1px 0;
+}
+
+.new-todo-container {
+  padding: 16px 16px 0;
+}
+
+.app__main {
+
+}
+
+.app__footer {
+  padding: 6px 16px;
+  background-color: #f5f5f5;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.count {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: rgba(0, 0, 0, .54);
+}
+
+.filter {
+  margin-top: -4px;
+  margin-left: 24px;
+}
+
+.filter .mat-radio-button {
+  margin-right: .5em;
+}
+
+.is-fullWidth {
+  width: 100%;
+}
+
+.todoTable {
+}
+
+.todoTable .mat-row {
+  padding-right: 5px;
+}
+
+.todoTable__row {
+}
+
+.todoTable__row--status {
+  flex: inherit;
+  width: 20px;
+  padding-right: 24px;
+  overflow: inherit;
+}
+
+.todoTable__row--delete {
+  flex: inherit;
+  width: 88px;
+  padding-left: 24px;
+}
+
+.clear-completed {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.cf::after {
+  content: '';
+  display: table;
+  clear: both;
+}
